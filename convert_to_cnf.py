@@ -1,6 +1,6 @@
 from logic_node import LogicNode
 from tokenizer import tokenize, parse_tokens
-from utils import remove_contradictions
+from utils import is_tautology
 
 def parse_formula(formula):
     """
@@ -220,8 +220,7 @@ def convert_to_cnf_list(formula):
     """
     cnf_node = convert_to_cnf(formula)
     cnf_list = node_to_list_of_lists(cnf_node)
-    for i in range(len(cnf_list)):
-        cnf_list[i] = remove_contradictions(cnf_list[i])
+    cnf_list = [clause for clause in cnf_list if not is_tautology(clause)]
     return cnf_list
 
 def main():

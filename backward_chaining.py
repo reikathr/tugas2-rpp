@@ -1,5 +1,4 @@
-from convert_to_cnf import convert_to_cnf_list
-from utils import convert_to_logical_format
+from utils import is_tautology
 
 def solve(kb, query, visited=None):
     """
@@ -7,6 +6,8 @@ def solve(kb, query, visited=None):
     """
     if visited is None:
         visited = set()
+
+    query = is_tautology(query)
     
     if not query:
         return True  # If contradiction removed all, assume success.
@@ -26,6 +27,10 @@ def solve(kb, query, visited=None):
             new_query = list(set([
                 (lit.replace('¬', '') if '¬' in lit else '¬' + lit) for lit in clause if lit != q
             ] + rest_query))
+
+            new_query = is_tautology(new_query)  # Clean new query
+
+            print(f"New query: {new_query}")
 
             if solve(kb, new_query, visited):
                 return True
@@ -52,6 +57,8 @@ def solve_opt(kb, query, cache=None, visited=None):
         return False  # Prevent infinite loops
 
     visited.add(query_key)  # Mark query as visited
+
+    query = is_tautology(query)
     
     if not query:
         cache[query_key] = True
@@ -66,6 +73,8 @@ def solve_opt(kb, query, cache=None, visited=None):
             new_query = list(set([
                 (lit.replace('¬', '') if '¬' in lit else '¬' + lit) for lit in clause if lit != q
             ] + rest_query))
+
+            new_query = is_tautology(new_query)
 
             print(f"Resolving {q} using clause {clause} gives new query: {new_query}")
 
