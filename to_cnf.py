@@ -355,17 +355,16 @@ def convert_to_cnf_list(formula):
     """
     cnf_node = convert_to_cnf(formula)
     cnf_list = node_to_list_of_lists(cnf_node)
-    for i in range(len(cnf_list)):
-        cnf_list[i] = remove_contradictions(cnf_list[i])
+    cnf_list = [clause for clause in cnf_list if not is_tautology(clause)]
     return cnf_list
 
-def remove_contradictions(query):
+def is_tautology(query):
     """
-    Removes contradictory literals from the query.
-    Example: If 'S07' and '¬S07' exist, both are removed.
+    Detects tautologies from the query.
+    Example: If 'S07' and '¬S07' exist, the query is a tautology.
     
     :param query: List of literals.
-    :return: Cleaned query (list), or [] if a contradiction is found.
+    :return: boolean
     """
     cleaned_query = set(query)  # Convert list to set for efficient lookups
 
@@ -373,16 +372,14 @@ def remove_contradictions(query):
         if lit.startswith("¬"):
             pos_lit = lit[1:]  # Get the positive version
             if pos_lit in cleaned_query:
-                print(f"Contradiction detected: {lit} and {pos_lit}. Removing both.")
-                cleaned_query.remove(lit)
-                cleaned_query.remove(pos_lit)
+                print(f"Tautology detected: {lit} or {pos_lit}.")
+                return True
 
         elif f"¬{lit}" in cleaned_query:
-            print(f"Contradiction detected: {lit} and ¬{lit}. Removing both.")
-            cleaned_query.remove(lit)
-            cleaned_query.remove(f"¬{lit}")
+            print(f"Tautology detected: {lit} or ¬{lit}.")
+            return True
 
-    return list(cleaned_query)  # Convert back to a list
+    return False
 
 
 def test_run():

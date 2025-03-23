@@ -1,31 +1,6 @@
 import re
 from to_cnf import convert_to_cnf_list
 
-def remove_contradictions(query):
-    """
-    Removes contradictory literals from the query.
-    Example: If 'S07' and '¬S07' exist, both are removed.
-    
-    :param query: List of literals.
-    :return: Cleaned query (list), or [] if a contradiction is found.
-    """
-    cleaned_query = set(query)  # Convert list to set for efficient lookups
-
-    for lit in list(cleaned_query):  # Iterate over a copy of the set
-        if lit.startswith("¬"):
-            pos_lit = lit[1:]  # Get the positive version
-            if pos_lit in cleaned_query:
-                print(f"Contradiction detected: {lit} and {pos_lit}. Removing both.")
-                cleaned_query.remove(lit)
-                cleaned_query.remove(pos_lit)
-
-        elif f"¬{lit}" in cleaned_query:
-            print(f"Contradiction detected: {lit} and ¬{lit}. Removing both.")
-            cleaned_query.remove(lit)
-            cleaned_query.remove(f"¬{lit}")
-
-    return list(cleaned_query)  # Convert back to a list
-
 
 def solve(kb, query, visited=None):
     """
@@ -33,9 +8,6 @@ def solve(kb, query, visited=None):
     """
     if visited is None:
         visited = set()
-
-    # Remove contradictions
-    query = remove_contradictions(query)
     
     if not query:
         return True  # If contradiction removed all, assume success.
@@ -55,8 +27,6 @@ def solve(kb, query, visited=None):
             new_query = list(set([
                 (lit.replace('¬', '') if '¬' in lit else '¬' + lit) for lit in clause if lit != q
             ] + rest_query))
-
-            new_query = remove_contradictions(new_query)  # Clean new query
 
             print(f"New query: {new_query}")
 
@@ -85,9 +55,6 @@ def solve_opt(kb, query, cache=None, visited=None):
         return False  # Prevent infinite loops
 
     visited.add(query_key)  # Mark query as visited
-
-    # Remove contradictions
-    query = remove_contradictions(query)
     
     if not query:
         cache[query_key] = True
@@ -102,8 +69,6 @@ def solve_opt(kb, query, cache=None, visited=None):
             new_query = list(set([
                 (lit.replace('¬', '') if '¬' in lit else '¬' + lit) for lit in clause if lit != q
             ] + rest_query))
-
-            new_query = remove_contradictions(new_query)
 
             print(f"Resolving {q} using clause {clause} gives new query: {new_query}")
 
