@@ -299,6 +299,20 @@ def main():
         (["S10"], "L03"),  # Chronic conditions (e.g., DM, heart disease) → Delayed
     ]
 
+    # Step 4: Define test cases based on the **simplified 10 rules**
+    # test_cases = [
+    #     (["S02"], "L01"),  # 18-59 years old → Eligible
+    #     (["S03"], "L01"),  # Over 59 years old → Eligible
+    #     (["S01"], "L02"),  # Under 18 → Not Eligible
+    #     (["S04"], "L02"),  # Severe allergy → Not Eligible
+    #     (["S10"], "L03"),  # Chronic conditions (e.g., DM, heart disease) → Delayed
+    #     (["S12"], "L02"),  # Pregnant → Not Eligible
+    #     (["S14"], "L02"),  # Covid survivor → Not Eligible
+    #     (["S13"], "L03"),  # Recent vaccination → Delayed
+    #     (["S05", "S12"], "L02"),  # Autoimmune disease + Pregnant → Not Eligible
+    #     (["S13", "S14"], "L03"),  # Recent vaccination + Covid survivor → Delayed
+    # ]
+
     # Step 5: Run tests with both `solve` and `solve_opt`
     for solver_name, solver in [("Unoptimized Solve", solve), ("Optimized Solve", solve_opt)]:
         print(f"\n=== Running Tests with {solver_name} ===")
