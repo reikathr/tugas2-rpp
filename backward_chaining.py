@@ -1,5 +1,19 @@
 from utils import is_tautology
 
+def verify_solution(kb, assignment):
+    """
+    Verifies whether the given assignment satisfies all clauses in the KB.
+    """
+    for clause in kb:
+        clause_satisfied = False
+        for literal in clause:
+            if literal in assignment and assignment[literal]:
+                clause_satisfied = True
+                break
+        if not clause_satisfied:
+            return False  # If any clause is not satisfied, return False
+    return True
+
 def solve(kb, query, visited=None):
     """
     SLD resolution using backward chaining with contradiction detection.
