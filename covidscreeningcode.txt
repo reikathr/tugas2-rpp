@@ -1,0 +1,15 @@
+S01 Under 18 years old 
+S02 18-59 years old 
+S03 Over 59 years old 
+S04 Severe allergic reaction (either after the first dose of vaccine or any vaccine) 
+S05 History of autoimmune disease 
+S06 Having an acute infection 
+S07 Having one/more of history of blood cancer, solid tumor cancer, blood disorders like immunohematology, hemophilia, blood 
+clotting disorders 
+S08 Are taking immunosuppressant drugs, cytostatic, radiotherapy (example: dexamethasone, methylprednisolone, prednisone) 
+S09 Are undergoing chemotherapy or radiotherapy (radiation therapy) 
+S10 Having one/more of history of DM, COPD, asthma, hypertension, epilepsy, metabolic disease, uncontrolled HIV-AIDS 
+S11 Having one/more of history of heart disease, kidney (failure/dialysis), liver disorders 
+S12 Is pregnant? 
+S13 Vaccination history other than Covid-19 is less than 1 month 
+S14 Having a history of Covid-19 (survivors) or currently Covid-19 
