@@ -1,3 +1,4 @@
+<<<<<<< HEAD:to_cnf.py
 class LogicNode:
     def __init__(self, type, value=None, left=None, right=None):
         self.type = type  # 'var', 'not', 'and', 'or', 'implies', 'equiv'
@@ -136,6 +137,11 @@ def parse_formula(formula):
     
     return tree
 
+=======
+from logic_node import LogicNode
+from tokenizer import tokenize, parse_tokens
+from utils import is_tautology
+>>>>>>> 0b41e03efc4dd2c805e33a4e7ca78fdffc77b137:convert_to_cnf.py
 
 def parse_formula(formula):
     """
@@ -358,6 +364,7 @@ def convert_to_cnf_list(formula):
     cnf_list = node_to_list_of_lists(cnf_node)
     cnf_list = [clause for clause in cnf_list if not is_tautology(clause)]
     return cnf_list
+<<<<<<< HEAD:to_cnf.py
 
 def is_tautology(query):
     """
@@ -420,6 +427,12 @@ def main():
     input_path = "logic_expressions.txt"
     output_path = "cnf_expressions.txt"
     test_run()
+=======
+
+def main():
+    input_path = "data/logic_expressions.txt"
+    output_path = "output/cnf_expressions.txt"
+>>>>>>> 0b41e03efc4dd2c805e33a4e7ca78fdffc77b137:convert_to_cnf.py
 
     with open(input_path, "r", encoding="utf-8") as infile, \
          open(output_path, "w", encoding="utf-8") as outfile:
