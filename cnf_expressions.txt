@@ -1,0 +1,20 @@
+Original: (C implies ((not C or E) equiv E))
+CNF as list of lists: [['¬C', 'C', 'E'], ['¬C', '¬E', 'E'], ['¬C', '¬E', '¬C', 'E']]
+Meaning: (¬C OR C OR E) AND (¬C OR ¬E OR E) AND (¬C OR ¬E OR ¬C OR E)
+
+Original: (((D implies not A) or not A) and ((C equiv E) or (not E implies D)))
+CNF as list of lists: [['¬D', '¬A', '¬A'], ['¬C', 'E', 'E', 'D'], ['¬E', 'C', 'E', 'D']]
+Meaning: (¬D OR ¬A OR ¬A) AND (¬C OR E OR E OR D) AND (¬E OR C OR E OR D)
+
+Original: (((not D implies A) implies (C or D)) or ((D implies A) and (A or A)))
+CNF as list of lists: [['¬D', 'C', 'D', '¬D', 'A'], ['¬D', 'C', 'D', 'A', 'A'], ['¬A', 'C', 'D', '¬D', 'A'], ['¬A', 'C', 'D', 'A', 'A']]
+Meaning: (¬D OR C OR D OR ¬D OR A) AND (¬D OR C OR D OR A OR A) AND (¬A OR C OR D OR ¬D OR A) AND (¬A OR C OR D OR A OR A)
+
+Original: (not D and ((C implies D) implies (D or not D)))
+CNF as list of lists: [['¬D'], ['C', 'D', '¬D'], ['¬D', 'D', '¬D']]
+Meaning: ¬D AND (C OR D OR ¬D) AND (¬D OR D OR ¬D)
+
+Original: ((B equiv (B or D)) equiv ((E and not B) and (A implies E)))
+CNF as list of lists: [['B', 'B', 'D', 'E'], ['B', 'B', 'D', '¬B'], ['B', 'B', 'D', '¬A', 'E'], ['B', '¬B', 'E'], ['B', '¬B', '¬B'], ['B', '¬B', '¬A', 'E'], ['¬B', 'B', 'D', 'E'], ['¬B', 'B', 'D', '¬B'], ['¬B', 'B', 'D', '¬A', 'E'], ['¬B', '¬B', 'E'], ['¬B', '¬B', '¬B'], ['¬B', '¬B', '¬A', 'E'], ['¬D', 'B', 'D', 'E'], ['¬D', 'B', 'D', '¬B'], ['¬D', 'B', 'D', '¬A', 'E'], ['¬D', '¬B', 'E'], ['¬D', '¬B', '¬B'], ['¬D', '¬B', '¬A', 'E'], ['¬E', 'B', 'A', '¬B', 'B', 'D'], ['¬E', 'B', 'A', '¬B', 'B'], ['¬E', 'B', 'A', '¬D', 'B'], ['¬E', 'B', '¬E', '¬B', 'B', 'D'], ['¬E', 'B', '¬E', '¬B', 'B'], ['¬E', 'B', '¬E', '¬D', 'B']]
+Meaning: (B OR B OR D OR E) AND (B OR B OR D OR ¬B) AND (B OR B OR D OR ¬A OR E) AND (B OR ¬B OR E) AND (B OR ¬B OR ¬B) AND (B OR ¬B OR ¬A OR E) AND (¬B OR B OR D OR E) AND (¬B OR B OR D OR ¬B) AND (¬B OR B OR D OR ¬A OR E) AND (¬B OR ¬B OR E) AND (¬B OR ¬B OR ¬B) AND (¬B OR ¬B OR ¬A OR E) AND (¬D OR B OR D OR E) AND (¬D OR B OR D OR ¬B) AND (¬D OR B OR D OR ¬A OR E) AND (¬D OR ¬B OR E) AND (¬D OR ¬B OR ¬B) AND (¬D OR ¬B OR ¬A OR E) AND (¬E OR B OR A OR ¬B OR B OR D) AND (¬E OR B OR A OR ¬B OR B) AND (¬E OR B OR A OR ¬D OR B) AND (¬E OR B OR ¬E OR ¬B OR B OR D) AND (¬E OR B OR ¬E OR ¬B OR B) AND (¬E OR B OR ¬E OR ¬D OR B)
+

@@ -1,0 +1,5 @@
+(C implies ((not C or E) equiv E))
+(((D implies not A) or not A) and ((C equiv E) or (not E implies D)))
+(((not D implies A) implies (C or D)) or ((D implies A) and (A or A)))
+(not D and ((C implies D) implies (D or not D)))
+((B equiv (B or D)) equiv ((E and not B) and (A implies E)))

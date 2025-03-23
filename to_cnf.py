@@ -347,7 +347,7 @@ def convert_to_cnf_list(formula):
     return node_to_list_of_lists(cnf_node)
 
 
-def main():
+def test_run():
     # Test run
     test_formulas = [
         "p implies q",
@@ -378,6 +378,37 @@ def main():
             print(f"Meaning: {' AND '.join(clauses)}")
         print()
 
+def main():
+    input_path = "logic_expressions.txt"
+    output_path = "cnf_expressions.txt"
+
+    with open(input_path, "r", encoding="utf-8") as infile, \
+         open(output_path, "w", encoding="utf-8") as outfile:
+
+        for line in infile:
+            formula = line.strip()
+            if not formula:
+                continue  # skip blank lines
+
+            outfile.write(f"Original: {formula}\n")
+            cnf_list = convert_to_cnf_list(formula)
+            outfile.write(f"CNF as list of lists: {cnf_list}\n")
+
+            # Print human-readable CNF
+            if len(cnf_list) == 1:
+                meaning = ' OR '.join(cnf_list[0])
+            else:
+                clauses = []
+                for clause in cnf_list:
+                    if len(clause) == 1:
+                        clauses.append(clause[0])
+                    else:
+                        clauses.append(f"({' OR '.join(clause)})")
+                meaning = ' AND '.join(clauses)
+
+            outfile.write(f"Meaning: {meaning}\n\n")
+
+    print(f"CNF transformation complete! Output saved to: {output_path}")
 
 if __name__ == "__main__":
     main()
