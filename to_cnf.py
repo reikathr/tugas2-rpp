@@ -32,99 +32,109 @@ def tokenize(formula):
     
     return tokens
 
+def parse_tokens(tokens, pos=0):
+    """
+    Parse tokens with proper operator precedence:
+    1. Parentheses (highest)
+    2. NOT
+    3. AND
+    4. OR
+    5. IMPLIES
+    6. EQUIV (lowest)
+    """
+    if pos >= len(tokens):
+        return None, pos
+    
+    # Start with the lowest precedence: parse_equiv
+    return parse_equiv(tokens, pos)
 
-def parse_tokens(tokens, start=0, end=None):
+def parse_equiv(tokens, pos):
+    """Parse equivalence (lowest precedence)"""
+    left, pos = parse_implies(tokens, pos)
+    
+    while pos < len(tokens) and tokens[pos] == "equiv":
+        pos += 1
+        right, pos = parse_implies(tokens, pos)
+        left = LogicNode("equiv", left=left, right=right)
+    
+    return left, pos
+
+def parse_implies(tokens, pos):
+    """Parse implication (second lowest precedence)"""
+    left, pos = parse_or(tokens, pos)
+    
+    while pos < len(tokens) and tokens[pos] == "implies":
+        pos += 1
+        right, pos = parse_or(tokens, pos)
+        left = LogicNode("implies", left=left, right=right)
+    
+    return left, pos
+
+def parse_or(tokens, pos):
+    """Parse disjunction"""
+    left, pos = parse_and(tokens, pos)
+    
+    while pos < len(tokens) and tokens[pos] == "or":
+        pos += 1
+        right, pos = parse_and(tokens, pos)
+        left = LogicNode("or", left=left, right=right)
+    
+    return left, pos
+
+def parse_and(tokens, pos):
+    """Parse conjunction"""
+    left, pos = parse_not(tokens, pos)
+    
+    while pos < len(tokens) and tokens[pos] == "and":
+        pos += 1
+        right, pos = parse_not(tokens, pos)
+        left = LogicNode("and", left=left, right=right)
+    
+    return left, pos
+
+def parse_not(tokens, pos):
+    """Parse negation"""
+    if pos < len(tokens) and tokens[pos] == "not":
+        pos += 1
+        expr, pos = parse_not(tokens, pos)  # NOT binds to the term immediately following it
+        return LogicNode("not", left=expr), pos
+    
+    return parse_term(tokens, pos)
+
+def parse_term(tokens, pos):
+    """Parse terms (variables or parenthesized expressions)"""
+    if pos >= len(tokens):
+        raise ValueError("Unexpected end of input")
+    
+    token = tokens[pos]
+    
+    # Handle parenthesized expressions
+    if token == "(":
+        pos += 1
+        expr, pos = parse_equiv(tokens, pos)  # Start from the lowest precedence inside parentheses
+        
+        if pos >= len(tokens) or tokens[pos] != ")":
+            raise ValueError("Expected closing parenthesis")
+        
+        return expr, pos + 1
+    
+    # Handle variables
+    if token not in ["and", "or", "implies", "equiv", "not", "(", ")"]:
+        return LogicNode("var", token), pos + 1
+    
+    raise ValueError(f"Unexpected token: {token}")
+
+def parse_formula(formula):
     """
-    Parse a list of tokens into a syntax tree with modified precedence.
+    Parse a propositional logic formula into a syntax tree with proper operator precedence.
     """
-    if end is None:
-        end = len(tokens)
+    tokens = tokenize(formula)
+    tree, pos = parse_tokens(tokens)
     
-    if start >= end:
-        return None, start
+    if pos < len(tokens):
+        raise ValueError(f"Unexpected tokens after parsing: {tokens[pos:]}")
     
-    # Handle higher precedence operations first (NOT and parentheses)
-    if tokens[start] == "not":
-        # Parse just the next term (variable or parenthesized expression)
-        next_pos = start + 1
-        if next_pos < end:
-            if tokens[next_pos] == "(":
-                # Handle parenthesized expression
-                depth = 1
-                pos = next_pos + 1
-                while pos < end and depth > 0:
-                    if tokens[pos] == "(":
-                        depth += 1
-                    elif tokens[pos] == ")":
-                        depth -= 1
-                    pos += 1
-                
-                if depth > 0:
-                    raise ValueError("Unbalanced parentheses")
-                
-                inner_expr, _ = parse_tokens(tokens, next_pos + 1, pos - 1)
-                term = LogicNode("not", left=inner_expr)
-                next_pos = pos
-            else:
-                # Handle single variable
-                term = LogicNode("not", left=LogicNode("var", tokens[next_pos]))
-                next_pos += 1
-            
-            # Check if there are operators after the NOT expression
-            if next_pos < end and tokens[next_pos] in ["and", "or", "implies", "equiv"]:
-                operator = tokens[next_pos]
-                right_expr, further_pos = parse_tokens(tokens, next_pos + 1, end)
-                return LogicNode(operator, left=term, right=right_expr), further_pos
-            
-            return term, next_pos
-        else:
-            raise ValueError("Expected term after 'not'")
-    
-    # Handle parenthesized expression
-    if tokens[start] == "(":
-        # Find the matching closing parenthesis
-        depth = 1
-        pos = start + 1
-        while pos < end and depth > 0:
-            if tokens[pos] == "(":
-                depth += 1
-            elif tokens[pos] == ")":
-                depth -= 1
-            pos += 1
-        
-        if depth > 0:
-            raise ValueError("Unbalanced parentheses")
-        
-        # Parse the expression inside parentheses
-        inner_end = pos - 1  # Position of the closing parenthesis
-        if inner_end == start + 1:  # Empty parentheses
-            return None, pos
-        
-        inner_expr, _ = parse_tokens(tokens, start + 1, inner_end)
-        
-        # Check for operators after parentheses
-        if pos < end and tokens[pos] in ["and", "or", "implies", "equiv"]:
-            operator = tokens[pos]
-            right_expr, next_pos = parse_tokens(tokens, pos + 1, end)
-            return LogicNode(operator, left=inner_expr, right=right_expr), next_pos
-        
-        return inner_expr, pos
-    
-    # Handle simple variable
-    if tokens[start] not in ["and", "or", "implies", "equiv", ")", "("]:
-        term = LogicNode("var", tokens[start])
-        next_pos = start + 1
-        
-        # Check if there are operators after the variable
-        if next_pos < end and tokens[next_pos] in ["and", "or", "implies", "equiv"]:
-            operator = tokens[next_pos]
-            right_expr, further_pos = parse_tokens(tokens, next_pos + 1, end)
-            return LogicNode(operator, left=term, right=right_expr), further_pos
-        
-        return term, next_pos
-    
-    # If we reach here, something is wrong with the input
-    raise ValueError(f"Unexpected token: {tokens[start]}")
+    return tree
 
 
 def parse_formula(formula):
@@ -344,7 +354,35 @@ def convert_to_cnf_list(formula):
     Convert a propositional logic formula to a list of lists representation of CNF
     """
     cnf_node = convert_to_cnf(formula)
-    return node_to_list_of_lists(cnf_node)
+    cnf_list = node_to_list_of_lists(cnf_node)
+    for i in range(len(cnf_list)):
+        cnf_list[i] = remove_contradictions(cnf_list[i])
+    return cnf_list
+
+def remove_contradictions(query):
+    """
+    Removes contradictory literals from the query.
+    Example: If 'S07' and '¬S07' exist, both are removed.
+    
+    :param query: List of literals.
+    :return: Cleaned query (list), or [] if a contradiction is found.
+    """
+    cleaned_query = set(query)  # Convert list to set for efficient lookups
+
+    for lit in list(cleaned_query):  # Iterate over a copy of the set
+        if lit.startswith("¬"):
+            pos_lit = lit[1:]  # Get the positive version
+            if pos_lit in cleaned_query:
+                print(f"Contradiction detected: {lit} and {pos_lit}. Removing both.")
+                cleaned_query.remove(lit)
+                cleaned_query.remove(pos_lit)
+
+        elif f"¬{lit}" in cleaned_query:
+            print(f"Contradiction detected: {lit} and ¬{lit}. Removing both.")
+            cleaned_query.remove(lit)
+            cleaned_query.remove(f"¬{lit}")
+
+    return list(cleaned_query)  # Convert back to a list
 
 
 def test_run():
@@ -357,7 +395,9 @@ def test_run():
         "p or (q and r)",
         "(p implies q) and (q implies r)",
         "not p or not q",
-        "(p or q) and (not q or r)"
+        "(p or q) and (not q or r)",
+        "not p or p",
+        "S02 or S03 and S04 implies L02"
     ]
     
     for formula in test_formulas:
@@ -381,6 +421,7 @@ def test_run():
 def main():
     input_path = "logic_expressions.txt"
     output_path = "cnf_expressions.txt"
+    test_run()
 
     with open(input_path, "r", encoding="utf-8") as infile, \
          open(output_path, "w", encoding="utf-8") as outfile:
