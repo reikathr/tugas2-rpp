@@ -9,7 +9,6 @@ def run_test_suite(kb, test_cases, solver, solver_name, log, file_name):
     log[solver_name] = {
         'total_tests': len(test_cases),
         'passed_tests': 0,
-        'test_details': [],
         'performance_metrics': {
             'total_time_ms': 0,
             'avg_time_ms': 0,
