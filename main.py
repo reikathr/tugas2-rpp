@@ -94,16 +94,33 @@ def main():
     ]
 
     test_cases_2 = [
+        # Basic eligibility rules
         (["S02"], "L01"),  # 18-59 years old → Eligible
         (["S03"], "L01"),  # Over 59 years old → Eligible
         (["S01"], "L02"),  # Under 18 → Not Eligible
+        
+        # Single condition rules leading to L02 (Not Eligible)
         (["S04"], "L02"),  # Severe allergy → Not Eligible
-        (["S10"], "L03"),  # Chronic conditions (e.g., DM, heart disease) → Delayed
         (["S12"], "L02"),  # Pregnant → Not Eligible
         (["S14"], "L02"),  # Covid survivor → Not Eligible
+        (["S06"], "L02"),  # Additional rule → Not Eligible
+        (["S07"], "L02"),  # Additional rule → Not Eligible
+        (["S08"], "L02"),  # Additional rule → Not Eligible
+        (["S15"], "L02"),  # Under-recovery conditions → Not Eligible
+        (["S16"], "L02"),  # Blood pressure conditions → Not Eligible
+        
+        # Single condition rules leading to L03 (Delayed)
+        (["S10"], "L03"),  # Chronic conditions → Delayed
         (["S13"], "L03"),  # Recent vaccination → Delayed
+        (["S09"], "L03"),  # Additional rule → Delayed
+        
+        # Combined conditions
         (["S05", "S12"], "L02"),  # Autoimmune disease + Pregnant → Not Eligible
         (["S13", "S14"], "L03"),  # Recent vaccination + Covid survivor → Delayed
+        (["S11", "S12"], "L02"),  # Additional combined rule → Not Eligible
+        (["S05", "S10"], "L03"),  # Autoimmune + Chronic conditions → Delayed
+        (["S17", "S04"], "L02"),  # Recent infection + Severe allergy → Not Eligible
+        (["S02", "NOT S04"], "L01"),  # 18-59 years old without allergies → Eligible
     ]
 
     # Step 5: Run both test suites with both solvers

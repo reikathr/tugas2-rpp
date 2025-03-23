@@ -1,40 +1,36 @@
 Optimized Solve_Dataset_1:
   passed_tests: 6
   performance_metrics:
-    avg_memory_kb: 1.18
-    avg_time_ms: 0.025116667529800907
-    peak_memory_kb: 1.92
-    total_memory_kb: 7.06
-    total_time_ms: 0.15070000517880544
-  test_details: []
+    avg_memory_kb: 1.28
+    avg_time_ms: 0.6054999988312678
+    peak_memory_kb: 2.22
+    total_memory_kb: 7.67
+    total_time_ms: 3.6329999929876067
   total_tests: 6
 Optimized Solve_Dataset_2:
-  passed_tests: 10
+  passed_tests: 20
   performance_metrics:
-    avg_memory_kb: 0.75
-    avg_time_ms: 0.040419999277219176
-    peak_memory_kb: 1.6
-    total_memory_kb: 7.45
-    total_time_ms: 0.40419999277219176
-  test_details: []
-  total_tests: 10
+    avg_memory_kb: 1.12
+    avg_time_ms: 0.5162799998288392
+    peak_memory_kb: 2.44
+    total_memory_kb: 22.37
+    total_time_ms: 10.325599996576784
+  total_tests: 20
 Unoptimized Solve_Dataset_1:
   passed_tests: 6
   performance_metrics:
-    avg_memory_kb: 1.25
-    avg_time_ms: 0.00938333384207605
-    peak_memory_kb: 2.0
-    total_memory_kb: 7.48
-    total_time_ms: 0.056300003052456304
-  test_details: []
+    avg_memory_kb: 1.35
+    avg_time_ms: 0.9196500007722838
+    peak_memory_kb: 2.31
+    total_memory_kb: 8.09
+    total_time_ms: 5.517900004633702
   total_tests: 6
 Unoptimized Solve_Dataset_2:
-  passed_tests: 10
+  passed_tests: 20
   performance_metrics:
-    avg_memory_kb: 0.58
-    avg_time_ms: 0.016480001067975536
-    peak_memory_kb: 1.43
-    total_memory_kb: 5.79
-    total_time_ms: 0.16480001067975536
-  test_details: []
-  total_tests: 10
+    avg_memory_kb: 0.95
+    avg_time_ms: 0.7846100001188461
+    peak_memory_kb: 2.28
+    total_memory_kb: 19.09
+    total_time_ms: 15.692200002376921
+  total_tests: 20

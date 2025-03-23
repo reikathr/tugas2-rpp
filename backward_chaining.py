@@ -14,16 +14,21 @@ def verify_solution(kb, assignment):
             return False  # If any clause is not satisfied, return False
     return True
 
-def solve(kb, query, visited=None):
+
+def solve(kb, query, visited=None, assignment=None):
     """
-    SLD resolution using backward chaining with contradiction detection.
+    SLD resolution using backward chaining with contradiction detection and solution verification.
     """
     if visited is None:
         visited = set()
+    if assignment is None:
+        assignment = {}
 
+    # Remove contradictions
     query = is_tautology(query)
     
     if not query:
+        print(f"Solution verified! Truth assignments: {assignment}")
         return True  # If contradiction removed all, assume success.
 
     query_key = tuple(sorted(query))
@@ -46,23 +51,32 @@ def solve(kb, query, visited=None):
 
             print(f"New query: {new_query}")
 
-            if solve(kb, new_query, visited):
-                return True
+            # Mark q as true in assignment
+            assignment[q] = True
+
+            if solve(kb, new_query, visited, assignment):
+                # After solving, verify if the assignment satisfies KB
+                if verify_solution(kb, assignment):
+                    print(f"Solution verified! Truth assignments: {assignment}")
+                    return True
 
     return False
 
-def solve_opt(kb, query, cache=None, visited=None):
+
+def solve_opt(kb, query, cache=None, visited=None, assignment=None):
     """
-    SLD resolution using backward chaining for CNF clauses with caching and cycle detection.
+    Optimized SLD resolution using backward chaining with caching, cycle detection, and solution verification.
     """
     if cache is None:
         cache = {}
     if visited is None:
         visited = set()
+    if assignment is None:
+        assignment = {}
 
     # Convert query to a canonical tuple representation
     query_key = tuple(sorted(query))
-    
+
     if query_key in cache:
         return cache[query_key]  # Use cached result
 
@@ -72,16 +86,17 @@ def solve_opt(kb, query, cache=None, visited=None):
 
     visited.add(query_key)  # Mark query as visited
 
+    # Remove contradictions
     query = is_tautology(query)
-    
+
     if not query:
         cache[query_key] = True
-        return True
+        print(f"Solution verified! Truth assignments: {assignment}")
+        return True  # If contradiction removed all, assume success.
 
-    q = query[0]         
+    q = query[0]
     rest_query = query[1:]
 
-    # Try to resolve q using KB
     for clause in kb:
         if q in clause:
             new_query = list(set([
@@ -92,9 +107,15 @@ def solve_opt(kb, query, cache=None, visited=None):
 
             print(f"Resolving {q} using clause {clause} gives new query: {new_query}")
 
-            if solve_opt(kb, new_query, cache, visited):  # Recursive call with cycle detection
-                cache[query_key] = True
-                return True
+            # Mark q as true in assignment
+            assignment[q] = True
+
+            if solve_opt(kb, new_query, cache, visited, assignment):
+                # After solving, verify if the assignment satisfies KB
+                if verify_solution(kb, assignment):
+                    cache[query_key] = True
+                    print(f"Solution verified! Truth assignments: {assignment}")
+                    return True
 
     cache[query_key] = False
     return False
