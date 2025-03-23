@@ -1,0 +1,77 @@
+from convert_to_cnf import convert_to_cnf_list
+from utils import convert_to_logical_format
+
+def solve(kb, query, visited=None):
+    """
+    SLD resolution using backward chaining with contradiction detection.
+    """
+    if visited is None:
+        visited = set()
+    
+    if not query:
+        return True  # If contradiction removed all, assume success.
+
+    query_key = tuple(sorted(query))
+    if query_key in visited:
+        print(f"Cycle detected for query: {query}")
+        return False  # Prevent infinite loops.
+
+    visited.add(query_key)  # Mark query as visited.
+
+    q = query[0]  # Take the first goal
+    rest_query = query[1:]  # Remaining goals
+
+    for clause in kb:
+        if q in clause:
+            new_query = list(set([
+                (lit.replace('¬', '') if '¬' in lit else '¬' + lit) for lit in clause if lit != q
+            ] + rest_query))
+
+            if solve(kb, new_query, visited):
+                return True
+
+    return False
+
+def solve_opt(kb, query, cache=None, visited=None):
+    """
+    SLD resolution using backward chaining for CNF clauses with caching and cycle detection.
+    """
+    if cache is None:
+        cache = {}
+    if visited is None:
+        visited = set()
+
+    # Convert query to a canonical tuple representation
+    query_key = tuple(sorted(query))
+    
+    if query_key in cache:
+        return cache[query_key]  # Use cached result
+
+    if query_key in visited:
+        print(f"Cycle detected for query: {query}")
+        return False  # Prevent infinite loops
+
+    visited.add(query_key)  # Mark query as visited
+    
+    if not query:
+        cache[query_key] = True
+        return True
+
+    q = query[0]         
+    rest_query = query[1:]
+
+    # Try to resolve q using KB
+    for clause in kb:
+        if q in clause:
+            new_query = list(set([
+                (lit.replace('¬', '') if '¬' in lit else '¬' + lit) for lit in clause if lit != q
+            ] + rest_query))
+
+            print(f"Resolving {q} using clause {clause} gives new query: {new_query}")
+
+            if solve_opt(kb, new_query, cache, visited):  # Recursive call with cycle detection
+                cache[query_key] = True
+                return True
+
+    cache[query_key] = False
+    return False

@@ -1,131 +1,6 @@
-class LogicNode:
-    def __init__(self, type, value=None, left=None, right=None):
-        self.type = type  # 'var', 'not', 'and', 'or', 'implies', 'equiv'
-        self.value = value  # for variables
-        self.left = left
-        self.right = right
-    
-    def __str__(self):
-        if self.type == 'var':
-            return self.value
-        elif self.type == 'not':
-            return f"¬({self.left})"
-        elif self.type == 'and':
-            return f"({self.left} ∧ {self.right})"
-        elif self.type == 'or':
-            return f"({self.left} ∨ {self.right})"
-        elif self.type == 'implies':
-            return f"({self.left} → {self.right})"
-        elif self.type == 'equiv':
-            return f"({self.left} ↔ {self.right})"
-
-
-def tokenize(formula):
-    """Tokenize a logical formula into a list of tokens."""
-    # Add spaces around parentheses
-    formula = formula.replace("(", " ( ")
-    formula = formula.replace(")", " ) ")
-    
-    # Split by spaces and filter out empty tokens
-    tokens = [token for token in formula.split() if token]
-    # print(tokens) # for debugging
-    
-    return tokens
-
-
-def parse_tokens(tokens, start=0, end=None):
-    """
-    Parse a list of tokens into a syntax tree with modified precedence.
-    """
-    if end is None:
-        end = len(tokens)
-    
-    if start >= end:
-        return None, start
-    
-    # Handle higher precedence operations first (NOT and parentheses)
-    if tokens[start] == "not":
-        # Parse just the next term (variable or parenthesized expression)
-        next_pos = start + 1
-        if next_pos < end:
-            if tokens[next_pos] == "(":
-                # Handle parenthesized expression
-                depth = 1
-                pos = next_pos + 1
-                while pos < end and depth > 0:
-                    if tokens[pos] == "(":
-                        depth += 1
-                    elif tokens[pos] == ")":
-                        depth -= 1
-                    pos += 1
-                
-                if depth > 0:
-                    raise ValueError("Unbalanced parentheses")
-                
-                inner_expr, _ = parse_tokens(tokens, next_pos + 1, pos - 1)
-                term = LogicNode("not", left=inner_expr)
-                next_pos = pos
-            else:
-                # Handle single variable
-                term = LogicNode("not", left=LogicNode("var", tokens[next_pos]))
-                next_pos += 1
-            
-            # Check if there are operators after the NOT expression
-            if next_pos < end and tokens[next_pos] in ["and", "or", "implies", "equiv"]:
-                operator = tokens[next_pos]
-                right_expr, further_pos = parse_tokens(tokens, next_pos + 1, end)
-                return LogicNode(operator, left=term, right=right_expr), further_pos
-            
-            return term, next_pos
-        else:
-            raise ValueError("Expected term after 'not'")
-    
-    # Handle parenthesized expression
-    if tokens[start] == "(":
-        # Find the matching closing parenthesis
-        depth = 1
-        pos = start + 1
-        while pos < end and depth > 0:
-            if tokens[pos] == "(":
-                depth += 1
-            elif tokens[pos] == ")":
-                depth -= 1
-            pos += 1
-        
-        if depth > 0:
-            raise ValueError("Unbalanced parentheses")
-        
-        # Parse the expression inside parentheses
-        inner_end = pos - 1  # Position of the closing parenthesis
-        if inner_end == start + 1:  # Empty parentheses
-            return None, pos
-        
-        inner_expr, _ = parse_tokens(tokens, start + 1, inner_end)
-        
-        # Check for operators after parentheses
-        if pos < end and tokens[pos] in ["and", "or", "implies", "equiv"]:
-            operator = tokens[pos]
-            right_expr, next_pos = parse_tokens(tokens, pos + 1, end)
-            return LogicNode(operator, left=inner_expr, right=right_expr), next_pos
-        
-        return inner_expr, pos
-    
-    # Handle simple variable
-    if tokens[start] not in ["and", "or", "implies", "equiv", ")", "("]:
-        term = LogicNode("var", tokens[start])
-        next_pos = start + 1
-        
-        # Check if there are operators after the variable
-        if next_pos < end and tokens[next_pos] in ["and", "or", "implies", "equiv"]:
-            operator = tokens[next_pos]
-            right_expr, further_pos = parse_tokens(tokens, next_pos + 1, end)
-            return LogicNode(operator, left=term, right=right_expr), further_pos
-        
-        return term, next_pos
-    
-    # If we reach here, something is wrong with the input
-    raise ValueError(f"Unexpected token: {tokens[start]}")
-
+from logic_node import LogicNode
+from tokenizer import tokenize, parse_tokens
+from utils import remove_contradictions
 
 def parse_formula(formula):
     """
@@ -344,43 +219,14 @@ def convert_to_cnf_list(formula):
     Convert a propositional logic formula to a list of lists representation of CNF
     """
     cnf_node = convert_to_cnf(formula)
-    return node_to_list_of_lists(cnf_node)
-
-
-def test_run():
-    # Test run
-    test_formulas = [
-        "p implies q",
-        "p equiv q",
-        "not (p and q)",
-        "not p or q",
-        "p or (q and r)",
-        "(p implies q) and (q implies r)",
-        "not p or not q",
-        "(p or q) and (not q or r)"
-    ]
-    
-    for formula in test_formulas:
-        print(f"Original: {formula}")
-        cnf_list = convert_to_cnf_list(formula)
-        print(f"CNF as list of lists: {cnf_list}")
-        
-        # Print the meaning
-        if len(cnf_list) == 1:
-            print(f"Meaning: {' OR '.join(cnf_list[0])}")
-        else:
-            clauses = []
-            for clause in cnf_list:
-                if len(clause) == 1:
-                    clauses.append(clause[0])
-                else:
-                    clauses.append(f"({' OR '.join(clause)})")
-            print(f"Meaning: {' AND '.join(clauses)}")
-        print()
+    cnf_list = node_to_list_of_lists(cnf_node)
+    for i in range(len(cnf_list)):
+        cnf_list[i] = remove_contradictions(cnf_list[i])
+    return cnf_list
 
 def main():
-    input_path = "logic_expressions.txt"
-    output_path = "cnf_expressions.txt"
+    input_path = "data/logic_expressions.txt"
+    output_path = "output/cnf_expressions.txt"
 
     with open(input_path, "r", encoding="utf-8") as infile, \
          open(output_path, "w", encoding="utf-8") as outfile:
