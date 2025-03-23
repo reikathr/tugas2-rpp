@@ -28,7 +28,7 @@ def tokenize(formula):
     
     # Split by spaces and filter out empty tokens
     tokens = [token for token in formula.split() if token]
-    print(tokens) # for debugging
+    # print(tokens) # for debugging
     
     return tokens
 
