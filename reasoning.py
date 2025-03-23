@@ -14,8 +14,8 @@ def solve(kb, query):
     # Try to resolve q using KB
     for clause in kb:
         if q in clause:  # If q appears in a clause, try resolving its subgoals
-            # negate every [¬p1,...,¬pm]
-            new_query = [lit.replace('¬','') for lit in clause if lit != q] + rest_query 
+            # Negate every [¬p1,...,¬pm]
+            new_query = [(lit.replace('¬', '') if '¬' in lit else '¬' + lit) for lit in clause if lit != q] + rest_query
             print(f"new query: {new_query}")
             if solve(kb, new_query):  # Recursively check if the new query can be solved
                 return True
