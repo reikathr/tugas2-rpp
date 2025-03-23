@@ -1,68 +1,119 @@
 import re
 from to_cnf import convert_to_cnf_list
 
-def solve(kb, query):
+def remove_contradictions(query):
     """
-    SLD resolution using backward chaining for CNF clauses.
-    :param kb: List of clauses (each clause is a list of literals).
-    :param query: List of literals to prove.
-    :return: True if query is entailed by KB, else False.
+    Removes contradictory literals from the query.
+    Example: If 'S07' and '¬S07' exist, both are removed.
+    
+    :param query: List of literals.
+    :return: Cleaned query (list), or [] if a contradiction is found.
     """
+    cleaned_query = set(query)  # Convert list to set for efficient lookups
+
+    for lit in list(cleaned_query):  # Iterate over a copy of the set
+        if lit.startswith("¬"):
+            pos_lit = lit[1:]  # Get the positive version
+            if pos_lit in cleaned_query:
+                print(f"Contradiction detected: {lit} and {pos_lit}. Removing both.")
+                cleaned_query.remove(lit)
+                cleaned_query.remove(pos_lit)
+
+        elif f"¬{lit}" in cleaned_query:
+            print(f"Contradiction detected: {lit} and ¬{lit}. Removing both.")
+            cleaned_query.remove(lit)
+            cleaned_query.remove(f"¬{lit}")
+
+    return list(cleaned_query)  # Convert back to a list
+
+
+def solve(kb, query, visited=None):
+    """
+    SLD resolution using backward chaining with contradiction detection.
+    """
+    if visited is None:
+        visited = set()
+
+    # Remove contradictions
+    query = remove_contradictions(query)
+    
     if not query:
-        return True  # Base case: If query is empty, we have proven all goals
+        return True  # If contradiction removed all, assume success.
+
+    query_key = tuple(sorted(query))
+    if query_key in visited:
+        print(f"Cycle detected for query: {query}")
+        return False  # Prevent infinite loops.
+
+    visited.add(query_key)  # Mark query as visited.
 
     q = query[0]  # Take the first goal
     rest_query = query[1:]  # Remaining goals
 
-    # Try to resolve q using KB
     for clause in kb:
-        if q in clause:  # If q appears in a clause, try resolving its subgoals
-            # Negate every [¬p1,...,¬pm]
-            new_query = [(lit.replace('¬', '') if '¬' in lit else '¬' + lit) for lit in clause if lit != q] + rest_query
-            print(f"new query: {new_query}")
-            if solve(kb, new_query):  # Recursively check if the new query can be solved
+        if q in clause:
+            new_query = list(set([
+                (lit.replace('¬', '') if '¬' in lit else '¬' + lit) for lit in clause if lit != q
+            ] + rest_query))
+
+            new_query = remove_contradictions(new_query)  # Clean new query
+
+            print(f"New query: {new_query}")
+
+            if solve(kb, new_query, visited):
                 return True
 
-    return False  # If no resolution leads to success, return False
+    return False
 
-def solve_opt(kb, query, cache=None):
+def solve_opt(kb, query, cache=None, visited=None):
     """
-    SLD resolution using backward chaining for CNF clauses with caching.
-    :param kb: List of clauses (each clause is a list of literals).
-    :param query: List of literals to prove.
-    :param cache: A dictionary to store visited queries.
-    :return: True if query is entailed by KB, else False.
+    SLD resolution using backward chaining for CNF clauses with caching and cycle detection.
     """
     if cache is None:
         cache = {}
+    if visited is None:
+        visited = set()
 
     # Convert query to a canonical tuple representation
     query_key = tuple(sorted(query))
+    
     if query_key in cache:
-        return cache[query_key]
+        return cache[query_key]  # Use cached result
 
+    if query_key in visited:
+        print(f"Cycle detected for query: {query}")
+        return False  # Prevent infinite loops
+
+    visited.add(query_key)  # Mark query as visited
+
+    # Remove contradictions
+    query = remove_contradictions(query)
+    
     if not query:
         cache[query_key] = True
         return True
 
-    q = query[0]         # Take the first goal
-    rest_query = query[1:]  # Remaining goals
+    q = query[0]         
+    rest_query = query[1:]
 
     # Try to resolve q using KB
     for clause in kb:
-        if q in clause:  # If q appears in a clause, try resolving its subgoals
-            # Negate every literal in the clause except q
-            new_query = [(lit.replace('¬', '') if '¬' in lit else '¬' + lit) 
-                         for lit in clause if lit != q] + rest_query
+        if q in clause:
+            new_query = list(set([
+                (lit.replace('¬', '') if '¬' in lit else '¬' + lit) for lit in clause if lit != q
+            ] + rest_query))
+
+            new_query = remove_contradictions(new_query)
+
             print(f"Resolving {q} using clause {clause} gives new query: {new_query}")
-            if solve_opt(kb, new_query, cache):  # Recursively check if the new query can be solved
+
+            if solve_opt(kb, new_query, cache, visited):  # Recursive call with cycle detection
                 cache[query_key] = True
                 return True
 
     cache[query_key] = False
     return False
 
-import re
 
 def convert_to_logical_format(file_path):
     """
@@ -227,7 +278,7 @@ def run_tests(solver, solver_name):
 
 def main():
     # Step 1: Load input by file
-    file_path = "covidinferencerules.txt"  # Ensure the correct file path
+    file_path = "covid_extended_rules_1.txt"  # Ensure the correct file path
 
     # Step 2: Process input into logical expressions
     logical_expressions = convert_to_logical_format(file_path)
@@ -238,43 +289,42 @@ def main():
         cnf_clause = convert_to_cnf_list(expression)  # Convert each logical rule to CNF
         kb.extend(cnf_clause)  # Add CNF clauses to KB
 
-    # Step 4: Define test cases with patient conditions
+    # Step 4: Define test cases based on the **5 simplified rules**
     test_cases = [
-        (["S02"], "L01"),  # 18-59 years old → Eligible for vaccine
-        (["S04"], "L02"),  # Severe allergic reaction → Not eligible
-        (["S12"], "L03"),  # Pregnant → Delayed consultation
-        (["S07", "S09"], "L03"),  # Blood cancer + Chemotherapy → Delayed
-        (["S14"], "L03"),  # Covid survivor → Delayed
-        (["S03", "S11"], "L03"),  # Chronic conditions (DM, heart disease, kidney failure) → Delayed
+        (["S02"], "L01"),  # 18-59 years old → Eligible
+        (["S03"], "L01"),  # Over 59 years old → Eligible
+        (["S01"], "L02"),  # Under 18 → Not Eligible
+        (["S02", "S04"], "L02"),  # Severe allergy → Not Eligible
+        (["S02", "S10"], "L03"),  # Chronic conditions (e.g., DM, heart disease) → Delayed
+        (["S10"], "L03"),  # Chronic conditions (e.g., DM, heart disease) → Delayed
     ]
 
-    # Step 5: Run tests
-    for conditions, expected in test_cases:
-        print(f"\nTesting conditions: {conditions}")
+    # Step 5: Run tests with both `solve` and `solve_opt`
+    for solver_name, solver in [("Unoptimized Solve", solve), ("Optimized Solve", solve_opt)]:
+        print(f"\n=== Running Tests with {solver_name} ===")
 
-        # Step 5.1: Create a local KB for each test with facts included
-        test_kb = kb.copy()  # Start with general KB
-        for fact in conditions:
-            test_kb.append([fact])  # Add each condition as a fact
+        for conditions, expected in test_cases:
+            print(f"\nTesting conditions: {conditions}")
 
-        # Step 5.2: Print KB before solving
-        print("\nFinal KB before solving:")
-        for clause in test_kb:
-            print(clause)
+            # Step 5.1: Create a local KB for each test with facts included
+            test_kb = kb.copy()  # Start with general KB
+            for fact in conditions:
+                test_kb.append([fact])  # Add each condition as a fact
 
-        # Step 5.3: Query reasoning engine with recursion limit
-        query = [expected]
-        try:
-            result = solve(test_kb, query)  # Ensure solve() has termination conditions
-        except RecursionError:
-            print(f"Error: Recursion limit exceeded for query: {query}")
-            result = False
+            # Step 5.2: Print KB before solving
+            print("\nFinal KB before solving:")
+            for clause in test_kb:
+                print(clause)
 
-        # Step 5.4: Print results and validate
-        print(f"Query: {query}, Result: {result}, Expected: {expected}")
-        assert result == True, f"Test failed for conditions: {conditions}"
+            # Step 5.3: Query reasoning engine
+            query = [expected]
+            result = solver(test_kb, query)
 
-    print("\nAll tests passed!")
+            # Step 5.4: Print results and validate
+            print(f"Query: {query}, Result: {result}, Expected: {expected}")
+            assert result == True, f"Test failed for conditions: {conditions}"
+
+        print(f"\nAll tests passed for {solver_name}!")
 
 if __name__ == "__main__":
     main()
