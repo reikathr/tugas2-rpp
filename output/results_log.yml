@@ -1,220 +1,40 @@
-covid_extended_rules_1.txt:
-  solver_stats:
-    Optimized Solve:
-      passed_tests: 6
-      performance:
-        avg_time_per_test: 0.0008374055226643881
-        peak_memory: 0.0027208328247070312
-        total_time: 0.005024433135986328
-      test_details:
-      - conditions: &id001
-        - S02
-        expected: L01
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.0009002685546875
-        result: true
-      - conditions: &id002
-        - S03
-        expected: L01
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.00122833251953125
-        result: true
-      - conditions: &id003
-        - S01
-        expected: L02
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.0014495849609375
-        result: true
-      - conditions: &id004
-        - S02
-        - S04
-        expected: L02
-        passed: true
-        performance:
-          execution_time: 0.005024433135986328
-          memory_used: 0.001678466796875
-        result: true
-      - conditions: &id005
-        - S02
-        - S10
-        expected: L03
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.00189971923828125
-        result: true
-      - conditions: &id006
-        - S10
-        expected: L03
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.00214385986328125
-        result: true
-      total_tests: 6
-    Unoptimized Solve:
-      passed_tests: 6
-      performance:
-        avg_time_per_test: 0.0
-        peak_memory: 0.0020952224731445312
-        total_time: 0.0
-      test_details:
-      - conditions: *id001
-        expected: L01
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.00072479248046875
-        result: true
-      - conditions: *id002
-        expected: L01
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.00090789794921875
-        result: true
-      - conditions: *id003
-        expected: L02
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.001007080078125
-        result: true
-      - conditions: *id004
-        expected: L02
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.0011138916015625
-        result: true
-      - conditions: *id005
-        expected: L03
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.00127410888671875
-        result: true
-      - conditions: *id006
-        expected: L03
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.00151824951171875
-        result: true
-      total_tests: 6
-covid_extended_rules_2.txt:
-  solver_stats:
-    Optimized Solve:
-      passed_tests: 6
-      performance:
-        avg_time_per_test: 0.0
-        peak_memory: 0.0022096633911132812
-        total_time: 0.0
-      test_details:
-      - conditions: &id007
-        - S02
-        expected: L01
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.0004425048828125
-        result: true
-      - conditions: &id008
-        - S03
-        expected: L01
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.00077056884765625
-        result: true
-      - conditions: &id009
-        - S01
-        expected: L02
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.0009918212890625
-        result: true
-      - conditions: &id010
-        - S02
-        - S04
-        expected: L02
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.001220703125
-        result: true
-      - conditions: &id011
-        - S02
-        - S10
-        expected: L03
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.00144195556640625
-        result: true
-      - conditions: &id012
-        - S10
-        expected: L03
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.00157928466796875
-        result: true
-      total_tests: 6
-    Unoptimized Solve:
-      passed_tests: 6
-      performance:
-        avg_time_per_test: 0.0
-        peak_memory: 0.0014696121215820312
-        total_time: 0.0
-      test_details:
-      - conditions: *id007
-        expected: L01
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.0002593994140625
-        result: true
-      - conditions: *id008
-        expected: L01
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.00046539306640625
-        result: true
-      - conditions: *id009
-        expected: L02
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.0005645751953125
-        result: true
-      - conditions: *id010
-        expected: L02
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.00067138671875
-        result: true
-      - conditions: *id011
-        expected: L03
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.00077056884765625
-        result: true
-      - conditions: *id012
-        expected: L03
-        passed: true
-        performance:
-          execution_time: 0.0
-          memory_used: 0.00089263916015625
-        result: true
-      total_tests: 6
+Optimized Solve_Dataset_1:
+  passed_tests: 6
+  performance_metrics:
+    avg_memory_kb: 1.18
+    avg_time_ms: 0.025116667529800907
+    peak_memory_kb: 1.92
+    total_memory_kb: 7.06
+    total_time_ms: 0.15070000517880544
+  test_details: []
+  total_tests: 6
+Optimized Solve_Dataset_2:
+  passed_tests: 10
+  performance_metrics:
+    avg_memory_kb: 0.75
+    avg_time_ms: 0.040419999277219176
+    peak_memory_kb: 1.6
+    total_memory_kb: 7.45
+    total_time_ms: 0.40419999277219176
+  test_details: []
+  total_tests: 10
+Unoptimized Solve_Dataset_1:
+  passed_tests: 6
+  performance_metrics:
+    avg_memory_kb: 1.25
+    avg_time_ms: 0.00938333384207605
+    peak_memory_kb: 2.0
+    total_memory_kb: 7.48
+    total_time_ms: 0.056300003052456304
+  test_details: []
+  total_tests: 6
+Unoptimized Solve_Dataset_2:
+  passed_tests: 10
+  performance_metrics:
+    avg_memory_kb: 0.58
+    avg_time_ms: 0.016480001067975536
+    peak_memory_kb: 1.43
+    total_memory_kb: 5.79
+    total_time_ms: 0.16480001067975536
+  test_details: []
+  total_tests: 10
