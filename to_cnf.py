@@ -319,25 +319,26 @@ def node_to_list_of_lists(node):
     if node.type == 'or':
         # For OR, we combine literals into a single clause
         result = []
-        clause = []
-        
+        clause = set()  # Use a set to remove duplicates
+
         # Helper function to collect literals in an OR expression
-        def collect_or_literals(or_node, clause_list):
+        def collect_or_literals(or_node, clause_set):
             if or_node.type == 'var':
-                clause_list.append(or_node.value)
+                clause_set.add(or_node.value)
             elif or_node.type == 'not' and or_node.left.type == 'var':
-                clause_list.append(f"¬{or_node.left.value}")
+                clause_set.add(f"¬{or_node.left.value}")
             elif or_node.type == 'or':
-                collect_or_literals(or_node.left, clause_list)
-                collect_or_literals(or_node.right, clause_list)
+                collect_or_literals(or_node.left, clause_set)
+                collect_or_literals(or_node.right, clause_set)
             else:
                 # This shouldn't happen in a well-formed CNF
                 sub_result = node_to_list_of_lists(or_node)
                 for sub_clause in sub_result:
-                    clause_list.extend(sub_clause)
-        
+                    clause_set.update(sub_clause)
+
         collect_or_literals(node, clause)
-        result.append(clause)
+        result.append(list(set(clause)))  # Remove duplicates by converting to a set and back to a list
+
         return result
     
     if node.type == 'and':
